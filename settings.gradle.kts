@@ -33,3 +33,5 @@ plugins {
 }
 
 include(":composeApp")
+include(":feature:home:api")
+include(":feature:home:impl")

@@ -4,7 +4,7 @@ import androidx.compose.material3.Typography
 
 //TODO: Add fonts
 val Typography = Typography(
-    displayLarge = TODO(),
+    /*displayLarge = TODO(),
     displayMedium = TODO(),
     displaySmall = TODO(),
     headlineLarge = TODO(),
@@ -18,5 +18,5 @@ val Typography = Typography(
     bodySmall = TODO(),
     labelLarge = TODO(),
     labelMedium = TODO(),
-    labelSmall = TODO()
+    labelSmall = TODO()*/
 )
