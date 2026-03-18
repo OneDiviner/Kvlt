@@ -33,5 +33,12 @@ plugins {
 }
 
 include(":composeApp")
-include(":feature:home:api")
-include(":feature:home:impl")
+
+include(":feature:tracks:api")
+include(":feature:tracks:impl")
+
+include(":feature:player:api")
+include(":feature:player:impl")
+
+include(":core:ui")
+include(":core:resources")

@@ -28,16 +28,29 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
-            implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
+            implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.jetbrains.navigation3.ui)
+            implementation(libs.jetbrains.lifecycle.viewmodelNavigation3)
+            implementation(libs.coil.core)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.okhttp)
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.chrisbanes.haze)
 
-            implementation(projects.feature.home.impl)
+            implementation(projects.core.ui)
+            implementation(projects.core.resources)
+
+            implementation(projects.feature.tracks.api)
+            implementation(projects.feature.tracks.impl)
+
+            implementation(projects.feature.player.api)
+            implementation(projects.feature.player.impl)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
