@@ -29,16 +29,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import coil3.compose.AsyncImage
 import com.example.ui.GlassIconButton
 import com.example.ui.GlassSearchTextField
 import dev.chrisbanes.haze.HazeState
@@ -50,15 +54,19 @@ import kvlt.core.resources.generated.resources.logo_icon
 import kvlt.core.resources.generated.resources.settings_icon
 import org.jetbrains.compose.resources.painterResource
 
+private const val SLIPKNOT_ALBUM_ART_URL = "https://i.ebayimg.com/images/g/g6wAAeSwh8NoNFSn/s-l1600.jpg"
+private const val GRIMA_ALBUM_ART_URL = "https://avatars.mds.yandex.net/i?id=d38375998f727662cc24a654f0d6fd47_l-3691447-images-thumbs&n=13"
+private const val STIGMATA_ALBUM_ART_URL = "https://avatars.yandex.net/get-music-content/6300975/a371a241.a.22870600-1/m1000x1000"
+
 @Composable
 fun TopBar(
-    onScroll: Boolean,
+    scrollAlpha: Float,
     hazeState: HazeState = rememberHazeState()
 ) {
     Column(
         modifier = Modifier
             .statusBarsPadding()
-            .padding(12.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
@@ -83,106 +91,112 @@ fun TopBar(
                 }
             )
         }
-        AnimatedVisibility(
-            visible = !onScroll,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .zIndex(3f)
-                            .size(80.dp)
-                            .rotate(18f)
-                            .offset(y = 5.dp)
-                            .dropShadow(
-                                shape = RoundedCornerShape(12.dp),
-                                shadow = Shadow(
-                                    radius = 5.dp,
-                                    color = Color(0xFF050505),
-                                    spread = 5.dp,
-                                    alpha = 0.15f
-                                )
-                            ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Blue
-                        )
-                    ) {
-
-                    }
-                    Card(
-                        modifier = Modifier
-                            .zIndex(2f)
-                            .size(80.dp)
-                            .rotate(-14f)
-                            .offset(y = -(3).dp, x = (20).dp)
-                            .dropShadow(
-                                shape = RoundedCornerShape(12.dp),
-                                shadow = Shadow(
-                                    radius = 5.dp,
-                                    color = Color(0xFF050505),
-                                    spread = 5.dp,
-                                    alpha = 0.15f
-                                )
-                            ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Red
-                        )
-                    ) {
-
-                    }
-                    Card(
-                        modifier = Modifier
-                            .zIndex(1f)
-                            .size(80.dp)
-                            .rotate(14f)
-                            .offset(y = (-5).dp, x = (-20).dp)
-                            .dropShadow(
-                                shape = RoundedCornerShape(12.dp),
-                                shadow = Shadow(
-                                    radius = 5.dp,
-                                    color = Color(0xFF050505),
-                                    spread = 5.dp,
-                                    alpha = 0.15f
-                                )
-                            ),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Green
-                        )
-                    ) {
-
-                    }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer {
+                    alpha = scrollAlpha
+                    val scale = 0.95f + (scrollAlpha * 0.05f)
+                    scaleX = scale
+                    scaleY = scale
+                    // Контент будет немного уходить вверх при схлопывании
+                    translationY = (1f - scrollAlpha) * -20f
                 }
-                Text(
-                    modifier = Modifier,
-                    text = "Треки с устройства",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 20.sp,
-                        letterSpacing = 0.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    // Высота схлопывается пропорционально scrollAlpha
+                    val currentHeight = (placeable.height * scrollAlpha).toInt()
+
+                    layout(placeable.width, currentHeight) {
+                        // Сдвигаем контент вверх быстрее, чем он исчезает
+                        // Это создаст эффект перекрытия
+                        val yOffset = ((placeable.height - currentHeight) * -0.8f).toInt()
+                        placeable.placeRelative(0, yOffset)
+                    }
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                AsyncImage(
+                    modifier = Modifier
+                        .zIndex(3f)
+                        .size(80.dp)
+                        .rotate(18f)
+                        .offset(y = 5.dp)
+                        .dropShadow(
+                            shape = RoundedCornerShape(12.dp),
+                            shadow = Shadow(
+                                radius = 20.dp,
+                                color = Color(0xFF050505),
+                                spread = 2.dp,
+                                alpha = 0.15f
+                            )
+                        )
+                        .clip(RoundedCornerShape(12.dp)),
+                    model = SLIPKNOT_ALBUM_ART_URL,
+                    contentDescription = null
                 )
-                Text(
-                    modifier = Modifier,
-                    text = "564 трека",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onBackground.copy(0.5f),
-                        fontSize = 16.sp,
-                        letterSpacing = 0.sp,
-                        fontWeight = FontWeight.Normal
-                    )
+                AsyncImage(
+                    modifier = Modifier
+                        .zIndex(2f)
+                        .size(80.dp)
+                        .rotate(-14f)
+                        .offset(y = -(3).dp, x = (20).dp)
+                        .dropShadow(
+                            shape = RoundedCornerShape(12.dp),
+                            shadow = Shadow(
+                                radius = 20.dp,
+                                color = Color(0xFF050505),
+                                spread = 2.dp,
+                                alpha = 0.15f
+                            )
+                        )
+                        .clip(RoundedCornerShape(12.dp)),
+                    model = GRIMA_ALBUM_ART_URL,
+                    contentDescription = null
+                )
+                AsyncImage(
+                    modifier = Modifier
+                        .zIndex(1f)
+                        .size(80.dp)
+                        .rotate(14f)
+                        .offset(y = (-5).dp, x = (-20).dp)
+                        .dropShadow(
+                            shape = RoundedCornerShape(12.dp),
+                            shadow = Shadow(
+                                radius = 20.dp,
+                                color = Color(0xFF050505),
+                                spread = 2.dp,
+                                alpha = 0.15f
+                            )
+                        )
+                        .clip(RoundedCornerShape(12.dp)),
+                    model = STIGMATA_ALBUM_ART_URL,
+                    contentDescription = null
                 )
             }
+            Text(
+                modifier = Modifier,
+                text = "Треки с устройства",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 20.sp,
+                    letterSpacing = 0.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+            Text(
+                modifier = Modifier,
+                text = "564 трека",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onBackground.copy(0.5f),
+                    fontSize = 16.sp,
+                    letterSpacing = 0.sp,
+                    fontWeight = FontWeight.Normal
+                )
+            )
         }
 
         var value by remember { mutableStateOf("") }

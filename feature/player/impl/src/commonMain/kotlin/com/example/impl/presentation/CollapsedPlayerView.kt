@@ -1,5 +1,6 @@
 package com.example.impl.presentation
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import coil3.compose.AsyncImage
 import com.example.api.PlaybackStatus
 import kvlt.core.resources.generated.resources.Res
 import kvlt.core.resources.generated.resources.album_icon
+import kvlt.core.resources.generated.resources.pause_icon
 import kvlt.core.resources.generated.resources.play_icon
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -76,65 +78,71 @@ fun CollapsedPlayerView(
 
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
 
-    Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 4.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        onClick = {}
+    AnimatedVisibility(
+        visible = state.playbackState.currentTrack != null
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 4.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ),
+            onClick = {}
         ) {
-
-            AlbumArtView(albumArtUri = state.playbackState.currentTrack?.albumArtUri)
-
-            Column(
-                modifier = Modifier.padding(8.dp).weight(1f),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    modifier = Modifier,
-                    text = state.playbackState.currentTrack?.title ?: "",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 16.sp,
-                        letterSpacing = 0.sp,
-                        fontWeight = FontWeight.Medium
+
+                AlbumArtView(albumArtUri = state.playbackState.currentTrack?.albumArtUri)
+
+                Column(
+                    modifier = Modifier.padding(8.dp).weight(1f),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        modifier = Modifier,
+                        text = state.playbackState.currentTrack?.title ?: "",
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 16.sp,
+                            letterSpacing = 0.sp,
+                            fontWeight = FontWeight.Medium
+                        )
                     )
-                )
-                Text(
-                    modifier = Modifier,
-                    text = state.playbackState.currentTrack?.artist ?: "",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onBackground.copy(0.5f),
-                        fontSize = 14.sp,
-                        letterSpacing = 0.sp,
-                        fontWeight = FontWeight.Light
+                    Text(
+                        modifier = Modifier,
+                        text = state.playbackState.currentTrack?.artist ?: "",
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.onBackground.copy(0.5f),
+                            fontSize = 14.sp,
+                            letterSpacing = 0.sp,
+                            fontWeight = FontWeight.Light
+                        )
                     )
-                )
-            }
-            IconButton(
-                modifier = Modifier,
-                shape = CircleShape,
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                onClick = {  }
-            ) {
-                Icon(
+                }
+                IconButton(
                     modifier = Modifier,
-                    painter = painterResource(Res.drawable.play_icon),
-                    contentDescription = null
-                )
+                    shape = CircleShape,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    onClick = {  }
+                ) {
+                    Icon(
+                        modifier = Modifier,
+                        painter = painterResource(
+                            resource = if (!state.playbackState.isPlaying) Res.drawable.play_icon
+                            else Res.drawable.pause_icon
+                        ),
+                        contentDescription = null
+                    )
+                }
             }
         }
     }
-
 }

@@ -9,9 +9,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -35,9 +41,33 @@ fun KvltApp() {
 
         val scrollState = rememberLazyListState()
 
-        val isTopBarHidden by remember {
-            derivedStateOf { scrollState.canScrollBackward }
-        } //TODO: Add observe scroll, to hide/show top bar and resize elements
+        val maxTopBarOffset = 500f
+        var topBarOffset by remember { mutableFloatStateOf(maxTopBarOffset) }
+
+        val nestedScrollConnection = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    val delta = available.y
+                    if (delta < 0 && topBarOffset > 0f) {
+                        val newOffset = (topBarOffset + delta).coerceIn(0f, maxTopBarOffset)
+                        topBarOffset = newOffset
+                        return Offset(0f, delta)
+                    }
+                    val isListAtTop = scrollState.firstVisibleItemIndex == 0 &&
+                            scrollState.firstVisibleItemScrollOffset == 0
+
+                    if (delta > 0 && isListAtTop && topBarOffset < maxTopBarOffset) {
+                        val newOffset = (topBarOffset + delta).coerceIn(0f, maxTopBarOffset)
+                        topBarOffset = newOffset
+                        return Offset(0f, delta)
+                    }
+
+                    return Offset.Zero
+                }
+            }
+        }
+
+        val scrollAlpha = topBarOffset / maxTopBarOffset
 
         val backStack = remember { mutableStateListOf<Any>(TracksNavKey) }
 
@@ -57,9 +87,12 @@ fun KvltApp() {
                 contentScale = ContentScale.Crop,
             )
             Scaffold(
-                modifier = Modifier.fillMaxSize().zIndex(1f),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(nestedScrollConnection)
+                    .zIndex(1f),
                 containerColor = Color.Transparent,
-                topBar = { TopBar(isTopBarHidden, hazeState) },
+                topBar = { TopBar(scrollAlpha, hazeState) },
                 bottomBar = { BottomBar() }
             ) { paddingValues ->
 
