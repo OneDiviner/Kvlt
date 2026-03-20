@@ -1,6 +1,9 @@
 package com.example.impl.presentation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,13 +76,22 @@ fun AlbumArtView(
 
 @Composable
 fun CollapsedPlayerView(
-    viewModel: PlayerViewModel = koinViewModel<PlayerViewModel>()
+    viewModel: PlayerViewModel = koinViewModel<PlayerViewModel>(),
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
 
     val state by viewModel.container.stateFlow.collectAsStateWithLifecycle()
 
     AnimatedVisibility(
-        visible = state.playbackState.currentTrack != null
+        modifier = modifier,
+        visible = state.playbackState.currentTrack != null,
+        enter = androidx.compose.animation.slideInVertically(
+            initialOffsetY = { fullHeight -> fullHeight }
+        ) + fadeIn(),
+        exit = slideOutVertically(
+            targetOffsetY = { fullHeight -> fullHeight }
+        ) + fadeOut()
     ) {
         Card(
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 4.dp),
@@ -88,7 +100,7 @@ fun CollapsedPlayerView(
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface
             ),
-            onClick = {}
+            onClick = onClick
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),

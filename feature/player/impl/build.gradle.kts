@@ -41,6 +41,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
+                implementation(libs.chrisbanes.haze)
 
                 implementation(projects.feature.player.api)
 
@@ -55,6 +56,7 @@ kotlin {
                 implementation(libs.androidx.media3.ui)
                 implementation(libs.androidx.media3.ui.compose)
                 implementation(libs.androidx.media3.session)
+                implementation(libs.androidx.window)
             }
         }
     }

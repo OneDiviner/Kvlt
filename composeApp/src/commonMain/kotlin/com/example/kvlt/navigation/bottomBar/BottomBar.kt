@@ -19,10 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.example.impl.presentation.CollapsedPlayerView
 import kvlt.core.resources.generated.resources.Res
 import kvlt.core.resources.generated.resources.collection_icon
@@ -31,14 +33,15 @@ import kvlt.core.resources.generated.resources.home_icon
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun BottomBar() {
+fun BottomBar(
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        CollapsedPlayerView()
         Row(
             modifier = Modifier
                 .fillMaxWidth()

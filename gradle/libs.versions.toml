@@ -54,6 +54,7 @@ mvikotlin = "4.3.0"
 orbit-mvi = "11.0.0"
 
 runner = "1.7.0"
+window = "1.5.1"
 
 [libraries]
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
@@ -129,6 +130,7 @@ orbit-mvi-core = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit-mvi
 orbit-mvi-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orbit-mvi" }
 orbit-mvi-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbit-mvi" }
 orbit-mvi-test = { module = "org.orbit-mvi:orbit-test", version.ref = "orbit-mvi" }
+androidx-window = { group = "androidx.window", name = "window", version.ref = "window" }
 
 
 [plugins]

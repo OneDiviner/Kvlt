@@ -95,22 +95,18 @@ fun TopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .graphicsLayer {
-                    alpha = scrollAlpha
-                    val scale = 0.95f + (scrollAlpha * 0.05f)
+                    alpha = scrollAlpha * 2f - 1f
+                    val scale = 0.4f + ((scrollAlpha * 2f - 1f).coerceIn(0f, 1f) * 0.6f)
                     scaleX = scale
                     scaleY = scale
-                    // Контент будет немного уходить вверх при схлопывании
                     translationY = (1f - scrollAlpha) * -20f
                 }
                 .layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
-                    // Высота схлопывается пропорционально scrollAlpha
                     val currentHeight = (placeable.height * scrollAlpha).toInt()
 
                     layout(placeable.width, currentHeight) {
-                        // Сдвигаем контент вверх быстрее, чем он исчезает
-                        // Это создаст эффект перекрытия
-                        val yOffset = ((placeable.height - currentHeight) * -0.8f).toInt()
+                        val yOffset = ((placeable.height - currentHeight) * -0.5f).toInt()
                         placeable.placeRelative(0, yOffset)
                     }
                 },
@@ -122,7 +118,7 @@ fun TopBar(
                 AsyncImage(
                     modifier = Modifier
                         .zIndex(3f)
-                        .size(80.dp)
+                        .size(100.dp)
                         .rotate(18f)
                         .offset(y = 5.dp)
                         .dropShadow(
@@ -141,7 +137,7 @@ fun TopBar(
                 AsyncImage(
                     modifier = Modifier
                         .zIndex(2f)
-                        .size(80.dp)
+                        .size(100.dp)
                         .rotate(-14f)
                         .offset(y = -(3).dp, x = (20).dp)
                         .dropShadow(
@@ -160,7 +156,7 @@ fun TopBar(
                 AsyncImage(
                     modifier = Modifier
                         .zIndex(1f)
-                        .size(80.dp)
+                        .size(100.dp)
                         .rotate(14f)
                         .offset(y = (-5).dp, x = (-20).dp)
                         .dropShadow(
