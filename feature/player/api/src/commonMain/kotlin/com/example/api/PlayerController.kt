@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 interface PlayerController {
 
     val playbackState: StateFlow<PlaybackState>
-    fun play(track: Track)
+
+    fun handleIntent(playerIntent: PlayerIntent)
 }

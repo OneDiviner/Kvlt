@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -30,6 +31,7 @@ import com.example.impl.presentation.PlayerBottomSheet
 import com.example.impl.presentation.TracksView
 import com.example.kvlt.navigation.bottomBar.BottomBar
 import com.example.kvlt.navigation.topBar.TopBar
+import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 
@@ -76,6 +78,7 @@ fun KvltApp() {
         val hazeState = rememberHazeState()
 
         var bottomBarAlpha by remember { mutableFloatStateOf(1f) }
+        var trackUri by remember { mutableStateOf("") }
 
         Box(
             modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
@@ -84,11 +87,19 @@ fun KvltApp() {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(200.dp)
+                    .graphicsLayer {
+                        alpha = 0.85f
+                    }
+                    //.blur(200.dp) //TODO: Heavy computing
+                    .hazeEffect {
+                        blurEnabled = true
+                        blurRadius = 200.dp
+                        noiseFactor = 0.05f
+                    }
                     .hazeSource(hazeState, zIndex = 0f),
-                model = SLIPKNOT_ALBUM_ART_URL,
+                model = trackUri,
                 contentDescription = "album_background",
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillHeight,
             )
             Scaffold(
                 modifier = Modifier
@@ -109,7 +120,10 @@ fun KvltApp() {
                     topBar = {
                         TopBar(scrollAlpha, hazeState)
                     },
-                    onSheetHeightChanged = { alpha -> bottomBarAlpha = alpha }
+                    onSheetHeightChanged = { alpha -> bottomBarAlpha = alpha },
+                    onTrackChanged = { uri ->
+                        trackUri = uri
+                    }
                 ) {
                     Box(
                         modifier = Modifier

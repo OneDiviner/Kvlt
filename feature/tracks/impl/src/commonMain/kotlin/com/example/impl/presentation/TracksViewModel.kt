@@ -3,6 +3,7 @@ package com.example.impl.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.api.PlayerController
+import com.example.api.PlayerIntent
 import com.example.api.Track
 import com.example.impl.domain.TracksRepository
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +46,7 @@ class TracksViewModel(
 
     private fun play(track: Track) = intent {
         withContext(Dispatchers.Main) {
-           playerController.play(track)
+           playerController.handleIntent(PlayerIntent.Play(track))
         }
     }
 

@@ -1,6 +1,6 @@
 package com.example.impl.di
 
-import com.example.impl.presentation.PlayerViewModel
+import com.example.impl.presentation.PlayerControllerViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -10,7 +10,7 @@ val playerModule = module {
         playerControllerModule
     )
     viewModel {
-        PlayerViewModel(playerController = get())
+        PlayerControllerViewModel(playerController = get())
     }
-    viewModelOf(::PlayerViewModel)
+    viewModelOf(::PlayerControllerViewModel)
 }

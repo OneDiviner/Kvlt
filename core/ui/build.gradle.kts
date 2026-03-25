@@ -25,6 +25,9 @@ kotlin {
                 implementation(libs.compose.ui)
                 implementation(libs.compose.components.resources)
                 implementation(libs.compose.uiToolingPreview)
+                implementation(libs.coil.core)
+                implementation(libs.coil.compose)
+                implementation(libs.coil.network.okhttp)
                 implementation(libs.chrisbanes.haze)
 
                 implementation(projects.core.resources)

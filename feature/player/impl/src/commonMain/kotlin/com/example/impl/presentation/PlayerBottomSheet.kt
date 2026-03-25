@@ -11,7 +11,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -23,6 +22,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.impl.presentation.expandedPlayer.ExpandedPlayerView
 import com.example.impl.presentation.util.getWindowHeight
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -31,8 +31,9 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun PlayerBottomSheet(
     modifier: Modifier = Modifier,
-    viewModel: PlayerViewModel = koinViewModel<PlayerViewModel>(),
+    viewModel: PlayerControllerViewModel = koinViewModel<PlayerControllerViewModel>(),
     onSheetHeightChanged: (alpha: Float) -> Unit = {},
+    onTrackChanged: (uri: String) -> Unit = {},
     topBar: @Composable (() -> Unit)? = null,
     content: @Composable ((PaddingValues) -> Unit)
 ) {
@@ -48,14 +49,22 @@ fun PlayerBottomSheet(
     val scope = rememberCoroutineScope()
     val alphaBySheetOffset by remember {
         derivedStateOf {
-            val alpha = try {
+            try {
                 val offset = scaffoldState.bottomSheetState.requireOffset()
                 ((offset) / screenHeight).coerceIn(0f, 1f)
             } catch (e: Exception) {
                 1f
             }
-            onSheetHeightChanged(alpha)
-            alpha
+        }
+    }
+
+    LaunchedEffect(alphaBySheetOffset) {
+        onSheetHeightChanged(alphaBySheetOffset)
+    }
+
+    LaunchedEffect(state.playbackState.currentTrack?.albumArtUri) {
+        state.playbackState.currentTrack?.albumArtUri?.let { uri ->
+            onTrackChanged(uri)
         }
     }
 
@@ -85,14 +94,19 @@ fun PlayerBottomSheet(
                 modifier = Modifier
             ) {
                 ExpandedPlayerView(
-                    modifier = Modifier.graphicsLayer { alpha = 1f - alphaBySheetOffset }
-                )
-                CollapsedPlayerView(
-                    modifier = Modifier.graphicsLayer { alpha = alphaBySheetOffset },
-                    onClick = {
-                        scope.launch { scaffoldState.bottomSheetState.expand() }
+                    modifier = Modifier.graphicsLayer { alpha = 1f - alphaBySheetOffset },
+                    onDismissButtonClick = {
+                        scope.launch { scaffoldState.bottomSheetState.partialExpand() }
                     }
                 )
+                if (alphaBySheetOffset > 0.1f) {
+                    CollapsedPlayerView(
+                        modifier = Modifier.graphicsLayer { alpha = alphaBySheetOffset },
+                        onClick = {
+                            scope.launch { scaffoldState.bottomSheetState.expand() }
+                        }
+                    )
+                }
             }
         },
         content = content

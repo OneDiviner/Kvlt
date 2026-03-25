@@ -4,16 +4,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -27,56 +22,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import com.example.api.PlaybackStatus
+import com.example.ui.AlbumArtView
 import kvlt.core.resources.generated.resources.Res
-import kvlt.core.resources.generated.resources.album_icon
 import kvlt.core.resources.generated.resources.pause_icon
 import kvlt.core.resources.generated.resources.play_icon
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@Composable
-fun AlbumArtView(
-    modifier: Modifier = Modifier,
-    albumArtUri: String? = null
-) {
-    Box(
-        modifier = modifier
-            .size(48.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(6.dp)
-            )
-            .clip(RoundedCornerShape(6.dp)),
-    ) {
-        if (albumArtUri.isNullOrEmpty()) {
-            Icon(
-                modifier = Modifier.padding(8.dp),
-                painter = painterResource(Res.drawable.album_icon),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground.copy(0.85f)
-            )
-        } else {
-            AsyncImage(
-                modifier = Modifier.fillMaxSize(),
-                model = albumArtUri,
-                contentDescription = "album_art"
-            )
-        }
-    }
-}
+
 
 @Composable
 fun CollapsedPlayerView(
-    viewModel: PlayerViewModel = koinViewModel<PlayerViewModel>(),
+    viewModel: PlayerControllerViewModel = koinViewModel<PlayerControllerViewModel>(),
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
@@ -117,7 +80,7 @@ fun CollapsedPlayerView(
                 ) {
                     Text(
                         modifier = Modifier,
-                        text = state.playbackState.currentTrack?.title ?: "",
+                        text = state.playbackState.currentTrack?.title ?: "", //TODO: Data must be clean
                         style = TextStyle(
                             color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 16.sp,
@@ -127,7 +90,7 @@ fun CollapsedPlayerView(
                     )
                     Text(
                         modifier = Modifier,
-                        text = state.playbackState.currentTrack?.artist ?: "",
+                        text = state.playbackState.currentTrack?.artist ?: "", //TODO: Data must be clean
                         style = TextStyle(
                             color = MaterialTheme.colorScheme.onBackground.copy(0.5f),
                             fontSize = 14.sp,
@@ -143,7 +106,7 @@ fun CollapsedPlayerView(
                         containerColor = Color.Transparent,
                         contentColor = MaterialTheme.colorScheme.onSurface
                     ),
-                    onClick = {  }
+                    onClick = { viewModel.dispatch(PlayerControllerIntent.TogglePlayPause) }
                 ) {
                     Icon(
                         modifier = Modifier,

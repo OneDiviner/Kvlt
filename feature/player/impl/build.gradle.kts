@@ -46,6 +46,7 @@ kotlin {
                 implementation(projects.feature.player.api)
 
                 implementation(projects.core.resources)
+                implementation(projects.core.ui)
             }
         }
 
